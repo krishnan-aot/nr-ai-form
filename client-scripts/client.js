@@ -504,7 +504,10 @@
       titleSpan = document.querySelector(".page-title");
       validTitleText = "Sample Form";
     }
-    return titleSpan && titleSpan.textContent.includes(validTitleText);
+    return (
+      (titleSpan && titleSpan.textContent.includes(validTitleText)) ||
+      Boolean(window.opener) // always assist in pop-up windows
+    );
   }
 
   /**
