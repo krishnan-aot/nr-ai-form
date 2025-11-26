@@ -47,6 +47,8 @@
               }
             });
 
+            console.log("Initializing chatbot in popup window");
+
             // initialize chat UI inside the popup and restore conversation
             initChatbot();
             removeExpiredStorage();
