@@ -31,6 +31,9 @@
 
             // if mid-way through populating the form (after a page refresh,)
             populateForm();
+            window.addEventListener("focus", async (event) => {
+              populateChatHistoryFromStorage();
+            });
           }
 
           // else a popup
@@ -54,6 +57,10 @@
             removeExpiredStorage();
             populateChatHistoryFromStorage();
             openChatModal();
+
+            window.addEventListener("focus", async (event) => {
+              populateChatHistoryFromStorage();
+            });
           }
         }
       } catch (err) {
