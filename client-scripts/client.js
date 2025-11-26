@@ -46,6 +46,12 @@
                 if (populated) await removeFromFilledFieldInStorage(populated);
               }
             });
+
+            // initialize chat UI inside the popup and restore conversation
+            initChatbot();
+            removeExpiredStorage();
+            populateChatHistoryFromStorage();
+            openChatModal();
           }
         }
       } catch (err) {
