@@ -757,7 +757,7 @@ function initBot() {
                     }
                     saveThreadId(sessionId);
                     showTyping(false);
-                    const messages = extractAssistantMessages(response);
+                    const messages = extractAssistantMessages(data);
                     messages.forEach((msg) => appendMessage('assistant', msg));
                 }
             } catch (err) {
@@ -814,25 +814,25 @@ function initBot() {
         }
     }
 
-    function extractAssistantMessages(response) {
-        if (response && response.response) {
-            if (Array.isArray(response.response)) {
-                const aggregatorItem = response.response.find((item) => item.source === 'Aggregator');
+    function extractAssistantMessages(data) {
+        if (data && data.response) {
+            if (Array.isArray(data.response)) {
+                const aggregatorItem = data.response.find((item) => item.source === 'Aggregator');
                 if (aggregatorItem && aggregatorItem.response) {
                     return [String(aggregatorItem.response)];
                 }
-            } else if (response.response.agent_messages) {
-                const messages = response.response.agent_messages;
+            } else if (data.response.agent_messages) {
+                const messages = data.response.agent_messages;
                 return Array.isArray(messages) ? messages.map(String) : [String(messages)];
-            } else if (typeof response.response === 'string') {
-                return [response.response];
+            } else if (typeof data.response === 'string') {
+                return [data.response];
             }
         }
 
-        if (typeof response === 'string') {
-            return [response];
+        if (typeof data === 'string') {
+            return [data];
         }
-        return [JSON.stringify(response)];
+        return [JSON.stringify(data)];
     }
 
     function appendMessage(role, text, persist = true) {
