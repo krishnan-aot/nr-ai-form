@@ -907,4 +907,5 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initBot);
 } else {
     initBot();
+    initWebSocket();
 }
