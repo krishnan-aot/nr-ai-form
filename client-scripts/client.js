@@ -47,7 +47,7 @@ function initWebSocket(sessionId) {
             if (data.event === "session_init") {
                 console.log("[WebSocket] Backend assigned new session ID:", data.session_id);
                 sessionId = data.session_id; // Update the local variable
-                localStorage.setItem("chat_session_id", sessionId); // Persist to browser
+                localStorage.setItem("nrAiForm_threadId", sessionId); // Persist to browser
                 return; // Exit early so we don't treat this system message as a chat message
             } else {
                 applyFormSupportSuggestionsFromResponse(data);
@@ -770,7 +770,6 @@ function initBot() {
                 appendMessage(entry.role, entry.text ?? '', false);
             }
         });
-        initWebSocket(sessionId);
     }
 
     function toggleChat() {
