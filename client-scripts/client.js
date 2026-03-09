@@ -32,8 +32,7 @@ async function getConversationHistory() {
 
 function initWebSocket(sessionId) {
     const wsUrlBase = 'ws://localhost:8003/ws';
-    const wsUrl = `${wsUrlBase}/${sessionId}`;
-    socket = new WebSocket(wsUrl);
+    socket = new WebSocket(wsUrlBase);
 
     socket.onopen = function (e) {
         console.log("[WebSocket] Connection established for session:", sessionId);
