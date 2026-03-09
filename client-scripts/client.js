@@ -30,51 +30,6 @@ async function getConversationHistory() {
     }
 }
 
-function initWebSocket(sessionId) {
-    const wsUrlBase = 'ws://localhost:8003/ws';
-    socket = new WebSocket(wsUrlBase);
-
-    socket.onopen = function (e) {
-        console.log("[WebSocket] Connection established for session:", sessionId);
-    };
-
-    socket.onmessage = function (event) {
-        console.log(`[WebSocket] Data received:`, event.data);
-        try {
-            const data = JSON.parse(event.data);
-            console.log('ws response: ', data);
-
-            if (data.event === "session_init") {
-                console.log("[WebSocket] Backend assigned new session ID:", data.session_id);
-                sessionId = data.session_id; // Update the local variable
-                localStorage.setItem("nrAiForm_threadId", sessionId); // Persist to browser
-                return; // Exit early so we don't treat this system message as a chat message
-            } else {
-                applyFormSupportSuggestionsFromResponse(data);
-                const serverThreadId = extractThreadIdFromResponse(data);
-                if (serverThreadId && serverThreadId !== sessionId) {
-                    migrateChatHistory(sessionId, serverThreadId);
-                    sessionId = serverThreadId;
-                }
-                saveThreadId(sessionId);
-                // showTyping(false);
-                // const messages = extractAssistantMessages(response);
-                // messages.forEach((msg) => appendMessage('assistant', msg));
-            }
-        } catch (err) {
-            console.error("Error parsing WebSocket message:", err);
-        }
-    };
-
-    socket.onclose = function (event) {
-        console.log("[WebSocket] Connection closed");
-    };
-
-    socket.onerror = function (error) {
-        console.error("[WebSocket] Error occurred");
-    };
-}
-
 function invokeAPIWithWS(query, step_number, session_id = null) {
     // Create JSON body for API request
     const body = {
@@ -85,7 +40,8 @@ function invokeAPIWithWS(query, step_number, session_id = null) {
 
     // make api call over WebSocket if connected
     if (!socket || socket.readyState !== WebSocket.OPEN) {
-        initWebSocket(session_id);
+        console.error("WebSocket not connected, cannot connect with AI services");
+        return;
     }
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(body));
@@ -771,6 +727,52 @@ function initBot() {
             }
         });
     }
+    initWebSocket(sessionId);
+
+    function initWebSocket(sessionId) {
+        const wsUrlBase = 'ws://localhost:8003/ws';
+        socket = new WebSocket(wsUrlBase);
+
+        socket.onopen = function (e) {
+            console.log("[WebSocket] Connection established for session:", sessionId);
+        };
+
+        socket.onmessage = function (event) {
+            console.log(`[WebSocket] Data received:`, event.data);
+            try {
+                const data = JSON.parse(event.data);
+                console.log('ws response: ', data);
+
+                if (data.event === "session_init") {
+                    console.log("[WebSocket] Backend assigned new session ID:", data.session_id);
+                    sessionId = data.session_id; // Update the local variable
+                    localStorage.setItem("nrAiForm_threadId", sessionId); // Persist to browser
+                    return; // Exit early so we don't treat this system message as a chat message
+                } else {
+                    applyFormSupportSuggestionsFromResponse(data);
+                    const serverThreadId = extractThreadIdFromResponse(data);
+                    if (serverThreadId && serverThreadId !== sessionId) {
+                        migrateChatHistory(sessionId, serverThreadId);
+                        sessionId = serverThreadId;
+                    }
+                    saveThreadId(sessionId);
+                    showTyping(false);
+                    const messages = extractAssistantMessages(response);
+                    messages.forEach((msg) => appendMessage('assistant', msg));
+                }
+            } catch (err) {
+                console.error("Error parsing WebSocket message:", err);
+            }
+        };
+
+        socket.onclose = function (event) {
+            console.log("[WebSocket] Connection closed");
+        };
+
+        socket.onerror = function (error) {
+            console.error("[WebSocket] Error occurred");
+        };
+    }
 
     function toggleChat() {
         const isOpen = chatModal.classList.contains('open');
@@ -894,5 +896,4 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initBot);
 } else {
     initBot();
-    initWebSocket();
 }
