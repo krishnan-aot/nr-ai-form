@@ -57,9 +57,9 @@ function initWebSocket(sessionId) {
                     sessionId = serverThreadId;
                 }
                 saveThreadId(sessionId);
-                showTyping(false);
-                const messages = extractAssistantMessages(response);
-                messages.forEach((msg) => appendMessage('assistant', msg));
+                // showTyping(false);
+                // const messages = extractAssistantMessages(response);
+                // messages.forEach((msg) => appendMessage('assistant', msg));
             }
         } catch (err) {
             console.error("Error parsing WebSocket message:", err);
@@ -75,7 +75,7 @@ function initWebSocket(sessionId) {
     };
 }
 
-async function invokeAPIWithWS(query, step_number, session_id = null) {
+function invokeAPIWithWS(query, step_number, session_id = null) {
     // Create JSON body for API request
     const body = {
         query,
@@ -804,18 +804,7 @@ function initBot() {
                 text = `Human verification form query : ${text}`;
             }
 
-            const response = await invokeOrchestrator(text, currentStep, sessionId);
-            applyFormSupportSuggestionsFromResponse(response);
-            const serverThreadId = extractThreadIdFromResponse(response);
-            if (serverThreadId && serverThreadId !== sessionId) {
-                migrateChatHistory(sessionId, serverThreadId);
-                sessionId = serverThreadId;
-            }
-            saveThreadId(sessionId);
-            showTyping(false);
-            const messages = extractAssistantMessages(response);
-            messages.forEach((msg) => appendMessage('assistant', msg));
-
+            invokeAPIWithWS(text, currentStep, sessionId);
         } catch (error) {
             showTyping(false);
             appendMessage('system', "Sorry, I encountered an error connecting to the server.");
