@@ -151,9 +151,8 @@ function getHistoryStorageKey(threadId) {
 
 async function loadChatHistory() {
     try {
-        const raw = await getConversationHistory();
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
+        const data = await getConversationHistory();
+        return Array.isArray(data) ? data : [];
     } catch {
         return [];
     }
@@ -669,7 +668,7 @@ function injectStyles() {
     document.head.appendChild(style);
 }
 
-function initBot() {
+async function initBot() {
     if (document.getElementById('wp-chat-button') || document.getElementById('wp-chat-modal')) {
         return;
     }
@@ -717,8 +716,8 @@ function initBot() {
 
     let sessionId = getStoredThreadId();
     saveThreadId(sessionId);
-    const existingHistory = loadChatHistory(sessionId);
-    if (existingHistory.length > 0) {
+    const existingHistory = await loadChatHistory(sessionId);
+    if (existingHistory && existingHistory.length > 0) {
         const welcome = chatMessages.querySelector('.wp-chat-welcome');
         if (welcome) welcome.remove();
         existingHistory.forEach((entry) => {
