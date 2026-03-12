@@ -731,7 +731,8 @@ function initBot() {
 
     function initWebSocket(sessionId) {
         console.log("[WebSocket] Connecting to ws://localhost:8003/ws with session ID:", sessionId);
-        socket = new WebSocket('ws://localhost:8003/ws', ["session_id", sessionId]);
+        const wsUrl = sessionId ? `ws://localhost:8003/ws?session_id=${encodeURIComponent(sessionId)}` : 'ws://localhost:8003/ws';
+        socket = new WebSocket(wsUrl);
 
         socket.onopen = function (e) {
             console.log("[WebSocket] Connection established for session:", sessionId);
