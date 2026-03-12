@@ -149,9 +149,9 @@ function getHistoryStorageKey(threadId) {
     return `${CHAT_HISTORY_STORAGE_PREFIX}:${threadId}`;
 }
 
-function loadChatHistory() {
+async function loadChatHistory() {
     try {
-        const raw = getConversationHistory();
+        const raw = await getConversationHistory();
         const parsed = raw ? JSON.parse(raw) : [];
         return Array.isArray(parsed) ? parsed : [];
     } catch {
@@ -159,9 +159,9 @@ function loadChatHistory() {
     }
 }
 
-function appendChatHistory(threadId, role, text) {
+async function appendChatHistory(threadId, role, text) {
     try {
-        const history = loadChatHistory(threadId);
+        const history = await loadChatHistory(threadId);
         history.push({ role, text });
         localStorage.setItem(getHistoryStorageKey(threadId), JSON.stringify(history));
     } catch (error) {
